@@ -6,16 +6,36 @@
   tasks:
     - name: configure network object-group
       asa_og:
-        name: ansible_test_0
+        name: ansible_network_og
         group_type: network-object
         state: present
-        description: ansible_test object-group description
+        description: ansible network object-group 
         host_ip:
             - 8.8.8.8
             - 8.8.4.4
-        ip_mask:
-            - 10.0.0.0 255.255.255.0
-            - 192.168.0.0 255.255.0.0
-        group_object:
-            - awx_lon
-            - awx_ams
+
+    # THIS DOES NOT WORK
+    # - name: configure port-object object-group
+    #   asa_og:
+    #     name: ansible_test_1
+    #     group_type: port-object
+    #     state: replace
+    #     description: ansible_test object-group description
+    #     protocol: tcp-udp
+    #     port_eq:
+    #     - 1025
+    #     - kerberos
+    #     port_range:
+    #     - 1025 5201
+    #     - 0 1024
+            
+       
+
+    - asa_acl:
+        lines:
+            - access-list ACL-ANSIBLE extended permit tcp any object-group ansible_network_og eq https
+            
+        # before: clear configure access-list ACL-ANSIBLE
+        match: strict
+        replace: block
+        
