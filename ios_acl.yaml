@@ -1,0 +1,26 @@
+---
+- hosts: all
+  gather_facts: no
+  connection: network_cli
+
+  tasks:
+    - name: Reorder current ACL so new entry can be added first
+      ios_config:
+          lines:
+            - ip access-list resequence ANSIBLE-TEST 1 10
+
+    - name: Get last line index
+      ios_command:
+          commands: show access-lists ANSIBLE-TEST | count .
+      register: line_position
+      
+    - set_fact: 
+       last_line: "{{ (line_position.stdout[0] | regex_search('\\d.') | int -2) *10}}"
+
+    - name: load new acl into device
+      ios_config:
+          lines:
+            - "{{ last_line }} deny ip host 192.9.9.9 any log"
+          
+          parents: ip access-list extended ANSIBLE-TEST
+          match: exact
