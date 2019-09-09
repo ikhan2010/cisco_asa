@@ -4,7 +4,7 @@
   connection: network_cli
 
   tasks:
-    - name: Reorder current ACL so new entry can be added first
+    - name: Reorder current ACL so new entry can be added at right position
       ios_config:
           lines:
             - ip access-list resequence ANSIBLE-TEST 1 10
